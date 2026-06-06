@@ -167,10 +167,10 @@ def generate_appointment_pdf(order: dict) -> bytes:
     # ── Payment confirmation ───────────────────────────────────────────────
     payment_status = order.get("payment_status", "unpaid")
     if payment_status == "paid":
-        pay_text = "✅  Service Fee: PAID — 6,000 ETB"
+        pay_text = "✅  Total Fee: PAID — 6,000 ETB (Government + Service)"
         pay_color = GREEN
     else:
-        pay_text = "⚠️  Service Fee: 6,000 ETB — PENDING PAYMENT"
+        pay_text = "⚠️  Total Fee: 6,000 ETB — PENDING PAYMENT"
         pay_color = colors.HexColor("#e67e22")
 
     pay_style = ParagraphStyle("Pay", parent=styles["Normal"],

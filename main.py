@@ -76,13 +76,13 @@ STRINGS = {
         ),
         "cancelled": "Order cancelled. Use /start to begin again.",
         "payment_msg": (
-            "💳 *Payment Required — Service Fee*\n\n"
+            "💳 *Payment Required*\n\n"
             "Your appointment has been approved! ✅\n\n"
-            f"Please pay the service fee of *{SERVICE_FEE}* to one of:\n\n"
+            f"Please pay the total fee of *{SERVICE_FEE}* to one of:\n\n"
             f"📱 *TeleBirr:* `{TELEBIRR_NUMBER}`\n"
             f"📱 *M-Pesa:*   `{MPESA_NUMBER}`\n\n"
-            "After payment, send your *payment screenshot* here.\n"
-            "⚠️ This fee covers our booking service only and does not include government fees."
+            f"ℹ️ This *{SERVICE_FEE}* covers both the government fee and our service fee combined.\n\n"
+            "After payment, send your *payment screenshot* here."
         ),
         "payment_received": (
             "✅ *Payment confirmed!*\n\n"
@@ -132,13 +132,13 @@ STRINGS = {
         ),
         "cancelled": "ትዕዛዝ ተሰርዟል። እንደገና ለመጀመር /start ይጠቀሙ።",
         "payment_msg": (
-            "💳 *ክፍያ ያስፈልጋል — የአገልግሎት ክፍያ*\n\n"
+            "💳 *ክፍያ ያስፈልጋል*\n\n"
             "ቀጠሮዎ ጸድቋል! ✅\n\n"
-            f"እባክዎ *{SERVICE_FEE}* ወደ አንዱ ይላኩ:\n\n"
+            f"እባክዎ ጠቅላላ ክፍያ *{SERVICE_FEE}* ወደ አንዱ ይላኩ:\n\n"
             f"📱 *ቴሌብር:* `{TELEBIRR_NUMBER}`\n"
             f"📱 *ኤም-ፔሳ:* `{MPESA_NUMBER}`\n\n"
-            "ከከፈሉ በኋላ *የክፍያ ስክሪንሾት* እዚህ ይላኩ።\n"
-            "⚠️ ይህ ክፍያ የቦት አገልግሎት ክፍያ ብቻ ሲሆን የመንግስት ክፍያን አያካትትም።"
+            f"ℹ️ ይህ *{SERVICE_FEE}* የመንግስት ክፍያ እና የአገልግሎት ክፍያ ጠቅላላ ድምር ነው።\n\n"
+            "ከከፈሉ በኋላ *የክፍያ ስክሪንሾት* እዚህ ይላኩ።"
         ),
         "payment_received": (
             "✅ *ክፍያ ተረጋግጧል!*\n\n"
@@ -188,13 +188,13 @@ STRINGS = {
         ),
         "cancelled": "Ajajni haquame. Deebi'uuf /start fayyadami.",
         "payment_msg": (
-            "💳 *Kaffaltii Barbaachisaa — Gatii Tajaajilaa*\n\n"
+            "💳 *Kaffaltii Barbaachisaa*\n\n"
             "Beellanni kee ni mirkanaaye! ✅\n\n"
-            f"Maaloo gatii tajaajilaa *{SERVICE_FEE}* kana ergii:\n\n"
+            f"Maaloo gatii waliigalaa *{SERVICE_FEE}* kana ergii:\n\n"
             f"📱 *TeleBirr:* `{TELEBIRR_NUMBER}`\n"
             f"📱 *M-Pesa:*   `{MPESA_NUMBER}`\n\n"
-            "Ergin booda *screenshot kaffaltiikee* asitti ergi.\n"
-            "⚠️ Kun gatii tajaajila keenyaaf qofa; gatii mootummaa hin hammatu."
+            f"ℹ️ *{SERVICE_FEE}* kun gatii mootummaa fi tajaajila keenyaa waliin dabalate.\n\n"
+            "Ergin booda *screenshot kaffaltiikee* asitti ergi."
         ),
         "payment_received": (
             "✅ *Kaffaltin mirkanaaye!*\n\n"
@@ -388,11 +388,10 @@ async def notify_admin_new_order(ctx, order_id, user, d):
         InlineKeyboardButton("🔄 Processing", callback_data=f"admin_processing_{order_id}"),
         InlineKeyboardButton("✅ Approve & Request Payment", callback_data=f"admin_booked_{order_id}"),
     ],[
-        InlineKeyboardButton("🎉 Complete",   callback_data=f"admin_completed_{order_id}"),
-        InlineKeyboardButton("❌ Cancel",      callback_data=f"admin_cancelled_{order_id}"),
+        InlineKeyboardButton("🎉 Complete",        callback_data=f"admin_completed_{order_id}"),
+        InlineKeyboardButton("❌ Cancel",           callback_data=f"admin_cancelled_{order_id}"),
     ],[
         InlineKeyboardButton("📅 Set Appointment", callback_data=f"admin_setappt_{order_id}"),
-        InlineKeyboardButton("📄 Send PDF",         callback_data=f"admin_sendpdf_{order_id}"),
     ]])
     await ctx.bot.send_message(ADMIN_ID, text, parse_mode="Markdown", reply_markup=kb)
     for photo_id in d.get("photos",[]):
@@ -433,12 +432,6 @@ async def admin_status_button(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             parse_mode="Markdown"
         )
         return  # handled by set_appt_date conversation
-
-    # ── Send PDF ──────────────────────────────────────────────────────────
-    if action == "sendpdf":
-        await send_appointment_pdf(ctx.bot, order, customer_id, lang)
-        await query.answer("PDF sent to customer!", show_alert=True)
-        return
 
     # ── Status updates ────────────────────────────────────────────────────
     status_map = {
